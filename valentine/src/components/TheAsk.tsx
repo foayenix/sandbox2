@@ -105,8 +105,8 @@ export default function TheAsk() {
     const emojis = ["💖", "💕", "💗", "💓", "❤️", "💘", "💝", "✨", "🌸"];
     const particles = Array.from({ length: 60 }, (_, i) => ({
       id: i,
-      x: 30 + Math.random() * 40,
-      y: 30 + Math.random() * 40,
+      x: 5 + Math.random() * 90,
+      y: 5 + Math.random() * 90,
       size: 16 + Math.random() * 24,
       rotation: Math.random() * 360,
       emoji: emojis[Math.floor(Math.random() * emojis.length)],
@@ -128,21 +128,20 @@ export default function TheAsk() {
 
     const btn = noBtnRef.current;
     if (!btn) return;
-    const parent = btn.parentElement;
-    if (!parent) return;
 
-    const parentRect = parent.getBoundingClientRect();
-    const btnRect = btn.getBoundingClientRect();
+    // Move the button to a random spot within the viewport (clamped to safe zone)
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const btnW = btn.offsetWidth;
+    const btnH = btn.offsetHeight;
 
-    const maxX = parentRect.width - btnRect.width - 10;
-    const maxY = parentRect.height - btnRect.height - 10;
+    const newX = 20 + Math.random() * (vw - btnW - 40);
+    const newY = 20 + Math.random() * (vh - btnH - 40);
 
-    const newX = Math.max(10, Math.random() * maxX);
-    const newY = Math.max(10, Math.random() * maxY);
-
-    btn.style.position = "absolute";
+    btn.style.position = "fixed";
     btn.style.left = `${newX}px`;
     btn.style.top = `${newY}px`;
+    btn.style.zIndex = "100";
     btn.style.transition = "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)";
   };
 
@@ -225,7 +224,7 @@ export default function TheAsk() {
                 Will you be my Valentine?
               </h2>
 
-              <div className="relative" style={{ minHeight: 100 }}>
+              <div className="flex flex-col items-center gap-4">
                 <motion.button
                   onClick={handleYes}
                   className="bg-blush-500 hover:bg-blush-600 text-white font-semibold py-3 px-8 rounded-full
@@ -236,16 +235,18 @@ export default function TheAsk() {
                 >
                   Yes 💘
                 </motion.button>
+              </div>
 
+              {/* No button — lives in the outer card so it has room to dodge */}
+              <div className="relative mt-4" style={{ minHeight: 60 }}>
                 <button
                   ref={noBtnRef}
                   onClick={noGaveUp ? handleYes : undefined}
                   onMouseEnter={!noGaveUp ? dodgeNo : undefined}
                   onTouchStart={!noGaveUp ? dodgeNo : undefined}
-                  className="mt-4 bg-white/70 hover:bg-white text-blush-500 font-semibold py-2.5 px-6 rounded-full
+                  className="bg-white/70 hover:bg-white text-blush-500 font-semibold py-2.5 px-6 rounded-full
                              shadow-md transition-all cursor-pointer
                              focus:outline-none focus:ring-4 focus:ring-blush-300"
-                  style={{ display: "inline-block" }}
                 >
                   {noGaveUp ? "Okay okay… Yes? 💕" : "No 😅"}
                 </button>
